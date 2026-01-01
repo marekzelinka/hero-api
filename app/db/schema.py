@@ -6,7 +6,7 @@ class Team(SQLModel, table=True):
 
     name: str
 
-    heroes: list["Hero"] = Relationship(back_populates="team")
+    heroes: list[Hero] = Relationship(back_populates="team")
 
 
 class HeroMissionLink(SQLModel, table=True):
@@ -25,7 +25,7 @@ class Hero(SQLModel, table=True):
     team_id: int | None = Field(default=None, foreign_key="team.id")
 
     team: Team | None = Relationship(back_populates="heroes")
-    missions: list["Mission"] = Relationship(
+    missions: list[Mission] = Relationship(
         back_populates="heroes", link_model=HeroMissionLink
     )
 
