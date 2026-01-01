@@ -2,8 +2,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.db.session import create_db_and_tables
-from app.routes import heroes, missions, teams
+from .db.session import create_db_and_tables
+from .routes import heroes, missions, teams
 
 
 @asynccontextmanager

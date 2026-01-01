@@ -47,7 +47,6 @@ def update_hero(
     hero = session.get(Hero, hero_id)
     if not hero:
         raise HTTPException(status_code=404, detail="Hero not found")
-    # Update the hero's attributes
     for field, value in hero_data.model_dump().items():
         setattr(hero, field, value)
     session.commit()
