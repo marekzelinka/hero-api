@@ -110,7 +110,7 @@ wheels = [
 ]
 
 [[package]]
-name = "herodb"
+name = "hero-api"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
