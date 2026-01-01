@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, HTTPException, Path
+from fastapi import APIRouter, Body, HTTPException, Path, status
 
 from app.db.schema import Hero, HeroMissionLink, Mission
 from app.db.session import SessionDep
@@ -24,10 +24,14 @@ def assign_hero_to_mission(
 ):
     mission = session.get(Mission, mission_id)
     if not mission:
-        raise HTTPException(status_code=404, detail="Mission not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Mission not found"
+        )
     hero = session.get(Hero, hero_id)
     if not hero:
-        raise HTTPException(status_code=404, detail="Hero not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Hero not found"
+        )
     hero_mission_link = HeroMissionLink(hero_id=hero_id, mission_id=mission_id)
     session.add(hero_mission_link)
     session.commit()
@@ -38,5 +42,7 @@ def assign_hero_to_mission(
 def read_mission(session: SessionDep, mission_id: Annotated[int, Path()]):
     mission = session.get(Mission, mission_id)
     if not mission:
-        raise HTTPException(status_code=404, detail="Mission not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Mission not found"
+        )
     return mission

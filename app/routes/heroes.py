@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, HTTPException, Path, Query
+from fastapi import APIRouter, Body, HTTPException, Path, Query, status
 from sqlmodel import select
 
 from app.db.schema import Hero, Team
@@ -34,7 +34,9 @@ def read_heroes(
 def read_hero(session: SessionDep, hero_id: Annotated[int, Path()]):
     hero = session.get(Hero, hero_id)
     if not hero:
-        raise HTTPException(status_code=404, detail="Hero not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Hero not found"
+        )
     return hero
 
 
@@ -46,7 +48,9 @@ def update_hero(
 ):
     hero = session.get(Hero, hero_id)
     if not hero:
-        raise HTTPException(status_code=404, detail="Hero not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Hero not found"
+        )
     for field, value in hero_data.model_dump().items():
         setattr(hero, field, value)
     session.commit()
@@ -62,10 +66,14 @@ def assign_hero_to_team(
 ):
     hero = session.get(Hero, hero_id)
     if not hero:
-        raise HTTPException(status_code=404, detail="Hero not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Hero not found"
+        )
     team = session.get(Team, team_id)
     if not team:
-        raise HTTPException(status_code=404, detail="Team not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Team not found"
+        )
     hero.team_id = team_id
     session.commit()
     session.refresh(hero)
@@ -76,7 +84,9 @@ def assign_hero_to_team(
 def delete_hero(session: SessionDep, hero_id: Annotated[int, Path()]):
     hero = session.get(Hero, hero_id)
     if not hero:
-        raise HTTPException(status_code=404, detail="Hero not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Hero not found"
+        )
     session.delete(hero)
     session.commit()
     return hero

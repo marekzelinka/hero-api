@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, HTTPException, Path
+from fastapi import APIRouter, Body, HTTPException, Path, status
 
 from app.db.schema import Team
 from app.db.session import SessionDep
@@ -20,5 +20,7 @@ def create_team(session: SessionDep, team: Annotated[Team, Body()]):
 def read_team(session: SessionDep, team_id: Annotated[int, Path()]):
     team = session.get(Team, team_id)
     if not team:
-        raise HTTPException(status_code=404, detail="Team not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Team not found"
+        )
     return team
