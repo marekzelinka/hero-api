@@ -2,25 +2,33 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, HTTPException, Path, status
 
-from app.db.schema import Hero, HeroMissionLink, Mission
+from app.db.schema import (
+    Hero,
+    HeroMissionLink,
+    Mission,
+    MissionCreate,
+    MissionPublic,
+    MissionUpdate,
+)
 from app.db.session import SessionDep
 
 router = APIRouter(prefix="/missions", tags=["missions"])
 
 
-@router.post("/", response_model=Mission, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=MissionPublic, status_code=status.HTTP_201_CREATED)
 def create_mission(
     *,
-    mission: Annotated[Mission, Body()],
+    mission: Annotated[MissionCreate, Body()],
     session: SessionDep,
 ):
-    session.add(mission)
+    db_mission = Mission.model_validate(mission)
+    session.add(db_mission)
     session.commit()
-    session.refresh(mission)
-    return mission
+    session.refresh(db_mission)
+    return db_mission
 
 
-@router.put("/{mission_id}/heroes/{hero_id}", response_model=Mission)
+@router.put("/{mission_id}/heroes/{hero_id}", response_model=MissionPublic)
 def assign_hero_to_mission(
     *,
     mission_id: Annotated[int, Path()],
@@ -43,7 +51,7 @@ def assign_hero_to_mission(
     return mission
 
 
-@router.get("/{mission_id}", response_model=Mission)
+@router.get("/{mission_id}", response_model=MissionPublic)
 def read_mission(
     *,
     mission_id: Annotated[int, Path()],
@@ -55,3 +63,23 @@ def read_mission(
             status_code=status.HTTP_404_NOT_FOUND, detail="Mission not found"
         )
     return mission
+
+
+@router.patch("/{mission_id}", response_model=MissionPublic)
+async def update_mission(
+    *,
+    mission_id: Annotated[int, Path()],
+    mission: Annotated[MissionUpdate, Body()],
+    session: SessionDep,
+):
+    db_mission = session.get(Mission, mission_id)
+    if not db_mission:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="mission not found"
+        )
+    mission_data = mission.model_dump(exclude_unset=True)
+    db_mission.sqlmodel_update(mission_data)
+    session.add(db_mission)
+    session.commit()
+    session.refresh(db_mission)
+    return db_mission

@@ -73,11 +73,25 @@ class HeroUpdate(SQLModel):
     team_id: int | None = None
 
 
-class Mission(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-
+class MissionBase(SQLModel):
     description: str
+
+
+class Mission(MissionBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
 
     heroes: list[Hero] = Relationship(
         back_populates="missions", link_model=HeroMissionLink
     )
+
+
+class MissionCreate(MissionBase):
+    pass
+
+
+class MissionPublic(MissionBase):
+    id: int
+
+
+class MissionUpdate(SQLModel):
+    description: str | None = None
