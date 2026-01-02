@@ -3,25 +3,26 @@ from typing import Annotated
 from fastapi import APIRouter, Body, HTTPException, Path, Query, status
 from sqlmodel import select
 
-from app.db.schema import Hero, Team
+from app.db.schema import Hero, HeroCreate, HeroPublic, HeroUpdate, Team
 from app.db.session import SessionDep
 
 router = APIRouter(prefix="/heroes", tags=["heroes"])
 
 
-@router.post("/", response_model=Hero, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=HeroPublic, status_code=status.HTTP_201_CREATED)
 def create_hero(
     *,
-    hero: Annotated[Hero, Body()],
+    hero: Annotated[HeroCreate, Body()],
     session: SessionDep,
 ):
-    session.add(hero)
+    db_hero = Hero.model_validate(hero)
+    session.add(db_hero)
     session.commit()
-    session.refresh(hero)
-    return hero
+    session.refresh(db_hero)
+    return db_hero
 
 
-@router.get("/", response_model=list[Hero])
+@router.get("/", response_model=list[HeroPublic])
 def read_heroes(
     *,
     skip: Annotated[int, Query()] = 0,
@@ -32,7 +33,7 @@ def read_heroes(
     return heroes
 
 
-@router.get("/{hero_id}", response_model=Hero)
+@router.get("/{hero_id}", response_model=HeroPublic)
 def read_hero(
     *,
     hero_id: Annotated[int, Path()],
@@ -46,26 +47,27 @@ def read_hero(
     return hero
 
 
-@router.patch("/{hero_id}", response_model=Hero)
+@router.patch("/{hero_id}", response_model=HeroPublic)
 def update_hero(
     *,
     hero_id: Annotated[int, Path()],
-    hero_data: Annotated[Hero, Body()],
+    hero: Annotated[HeroUpdate, Body()],
     session: SessionDep,
 ):
-    hero = session.get(Hero, hero_id)
-    if not hero:
+    db_hero = session.get(Hero, hero_id)
+    if not db_hero:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Hero not found"
         )
-    for field, value in hero_data.model_dump().items():
-        setattr(hero, field, value)
+    hero_data = hero.model_dump(exclude_unset=True)
+    db_hero.sqlmodel_update(hero_data)
+    session.add(db_hero)
     session.commit()
-    session.refresh(hero)
-    return hero
+    session.refresh(db_hero)
+    return db_hero
 
 
-@router.put("/{hero_id}/team/{team_id}")
+@router.put("/{hero_id}/team/{team_id}", response_model=HeroPublic)
 def assign_hero_to_team(
     *,
     hero_id: Annotated[int, Path()],
