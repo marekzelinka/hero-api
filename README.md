@@ -1,11 +1,12 @@
 # Hero DB
 
-This project is represents an simpple API with teams, heroes and missions.
+This project is represents an REST API for teams of heroes, that can be assigned to missions.
 
 ## Features
 
 - Data stored in SQLite
 - CRUD for teams, heroes and missions
+- Heroes can be assigned to teams and missions.
 - OpenAPI-based REST API
 
 ## Setup
@@ -42,3 +43,4 @@ This project uses the modern `pyproject.toml` standard for dependency management
 
 - [ ] public APIs
 - [ ] explore using `neon` as db provider
+- [ ] deploy to `fly.io`
