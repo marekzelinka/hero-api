@@ -48,6 +48,10 @@ This project uses the modern `pyproject.toml` standard for dependency management
 
 ## Todo
 
-- [ ] public APIs
+- [x] public APIs
 - [ ] explore using `neon` as db provider
 - [ ] deploy to `fly.io`
+- [ ] remove hero from mission
+- [ ] add mission status: `"active" | "done"`
+- [ ] disable adding heros to mission, if mission is done
+- [ ] add tests
