@@ -1,13 +1,28 @@
 from sqlmodel import Field, Relationship, SQLModel
 
 
-class Team(SQLModel, table=True):
+class TeamBase(SQLModel):
+    name: str = Field(index=True)
+    headquarters: str
+
+
+class Team(TeamBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
 
-    name: str
-    headsquarters: str
-
     heroes: list[Hero] = Relationship(back_populates="team")
+
+
+class TeamCreate(TeamBase):
+    pass
+
+
+class TeamPublic(TeamBase):
+    id: int
+
+
+class TeamUpdate(SQLModel):
+    name: str | None = None
+    headquarters: str | None = None
 
 
 class HeroMissionLink(SQLModel, table=True):
