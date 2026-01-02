@@ -20,6 +20,10 @@ class TeamPublic(TeamBase):
     id: int
 
 
+class TeamPublicWithHeroes(TeamPublic):
+    heroes: list[HeroPublic] = []
+
+
 class TeamUpdate(SQLModel):
     name: str | None = None
     headquarters: str | None = None
@@ -55,6 +59,10 @@ class HeroCreate(HeroBase):
 
 class HeroPublic(HeroBase):
     id: int
+
+
+class HeroPublicWithTeam(HeroPublic):
+    team: TeamPublic | None = None
 
 
 class HeroUpdate(SQLModel):

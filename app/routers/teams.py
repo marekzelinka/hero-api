@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Body, HTTPException, Path, Query, status
 from sqlmodel import select
 
-from app.db.schema import Team, TeamCreate, TeamPublic, TeamUpdate
+from app.db.schema import Team, TeamCreate, TeamPublic, TeamPublicWithHeroes, TeamUpdate
 from app.db.session import SessionDep
 
 router = APIRouter(prefix="/teams", tags=["teams"])
@@ -33,7 +33,7 @@ async def read_teams(
     return teams
 
 
-@router.get("/{team_id}", response_model=TeamPublic)
+@router.get("/{team_id}", response_model=TeamPublicWithHeroes)
 def read_team(
     *,
     team_id: Annotated[int, Path()],

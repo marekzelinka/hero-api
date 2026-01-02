@@ -3,7 +3,14 @@ from typing import Annotated
 from fastapi import APIRouter, Body, HTTPException, Path, Query, status
 from sqlmodel import select
 
-from app.db.schema import Hero, HeroCreate, HeroPublic, HeroUpdate, Team
+from app.db.schema import (
+    Hero,
+    HeroCreate,
+    HeroPublic,
+    HeroPublicWithTeam,
+    HeroUpdate,
+    Team,
+)
 from app.db.session import SessionDep
 
 router = APIRouter(prefix="/heroes", tags=["heroes"])
@@ -33,7 +40,7 @@ def read_heroes(
     return heroes
 
 
-@router.get("/{hero_id}", response_model=HeroPublic)
+@router.get("/{hero_id}", response_model=HeroPublicWithTeam)
 def read_hero(
     *,
     hero_id: Annotated[int, Path()],
