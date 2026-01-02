@@ -3,8 +3,9 @@ from typing import Annotated, Generator
 from fastapi import Depends
 from sqlmodel import Session, SQLModel, create_engine
 
-from app.core.config import DATABASE_URL
+from app.core.config import config
 
+DATABASE_URL = config.database_url
 connect_args = {"check_same_thread": False}
 engine = create_engine(DATABASE_URL, echo=True, connect_args=connect_args)
 

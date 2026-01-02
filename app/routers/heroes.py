@@ -9,10 +9,11 @@ from app.db.session import SessionDep
 router = APIRouter(prefix="/heroes", tags=["heroes"])
 
 
-@router.post("/", response_model=Hero)
+@router.post("/", response_model=Hero, status_code=status.HTTP_201_CREATED)
 def create_hero(
-    session: SessionDep,
+    *,
     hero: Annotated[Hero, Body()],
+    session: SessionDep,
 ):
     session.add(hero)
     session.commit()
@@ -22,16 +23,21 @@ def create_hero(
 
 @router.get("/", response_model=list[Hero])
 def read_heroes(
-    session: SessionDep,
+    *,
     skip: Annotated[int, Query()] = 0,
     limit: Annotated[int, Query()] = 10,
+    session: SessionDep,
 ):
     heroes = session.exec(select(Hero).offset(skip).limit(limit)).all()
     return heroes
 
 
 @router.get("/{hero_id}", response_model=Hero)
-def read_hero(session: SessionDep, hero_id: Annotated[int, Path()]):
+def read_hero(
+    *,
+    hero_id: Annotated[int, Path()],
+    session: SessionDep,
+):
     hero = session.get(Hero, hero_id)
     if not hero:
         raise HTTPException(
@@ -40,11 +46,12 @@ def read_hero(session: SessionDep, hero_id: Annotated[int, Path()]):
     return hero
 
 
-@router.put("/{hero_id}", response_model=Hero)
+@router.patch("/{hero_id}", response_model=Hero)
 def update_hero(
-    session: SessionDep,
+    *,
     hero_id: Annotated[int, Path()],
     hero_data: Annotated[Hero, Body()],
+    session: SessionDep,
 ):
     hero = session.get(Hero, hero_id)
     if not hero:
@@ -60,9 +67,10 @@ def update_hero(
 
 @router.put("/{hero_id}/team/{team_id}")
 def assign_hero_to_team(
-    session: SessionDep,
+    *,
     hero_id: Annotated[int, Path()],
     team_id: Annotated[int, Path()],
+    session: SessionDep,
 ):
     hero = session.get(Hero, hero_id)
     if not hero:
@@ -80,8 +88,12 @@ def assign_hero_to_team(
     return hero
 
 
-@router.delete("/{hero_id}", response_model=Hero)
-def delete_hero(session: SessionDep, hero_id: Annotated[int, Path()]):
+@router.delete("/{hero_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_hero(
+    *,
+    hero_id: Annotated[int, Path()],
+    session: SessionDep,
+):
     hero = session.get(Hero, hero_id)
     if not hero:
         raise HTTPException(
@@ -89,4 +101,3 @@ def delete_hero(session: SessionDep, hero_id: Annotated[int, Path()]):
         )
     session.delete(hero)
     session.commit()
-    return hero

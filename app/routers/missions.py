@@ -8,8 +8,12 @@ from app.db.session import SessionDep
 router = APIRouter(prefix="/missions", tags=["missions"])
 
 
-@router.post("/", response_model=Mission)
-def create_mission(session: SessionDep, mission: Annotated[Mission, Body()]):
+@router.post("/", response_model=Mission, status_code=status.HTTP_201_CREATED)
+def create_mission(
+    *,
+    mission: Annotated[Mission, Body()],
+    session: SessionDep,
+):
     session.add(mission)
     session.commit()
     session.refresh(mission)
@@ -18,9 +22,10 @@ def create_mission(session: SessionDep, mission: Annotated[Mission, Body()]):
 
 @router.put("/{mission_id}/heroes/{hero_id}", response_model=Mission)
 def assign_hero_to_mission(
-    session: SessionDep,
+    *,
     mission_id: Annotated[int, Path()],
     hero_id: Annotated[int, Path()],
+    session: SessionDep,
 ):
     mission = session.get(Mission, mission_id)
     if not mission:
@@ -39,7 +44,11 @@ def assign_hero_to_mission(
 
 
 @router.get("/{mission_id}", response_model=Mission)
-def read_mission(session: SessionDep, mission_id: Annotated[int, Path()]):
+def read_mission(
+    *,
+    mission_id: Annotated[int, Path()],
+    session: SessionDep,
+):
     mission = session.get(Mission, mission_id)
     if not mission:
         raise HTTPException(

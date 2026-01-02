@@ -8,8 +8,12 @@ from app.db.session import SessionDep
 router = APIRouter(prefix="/teams", tags=["teams"])
 
 
-@router.post("/", response_model=Team)
-def create_team(session: SessionDep, team: Annotated[Team, Body()]):
+@router.post("/", response_model=Team, status_code=status.HTTP_201_CREATED)
+def create_team(
+    *,
+    team: Annotated[Team, Body()],
+    session: SessionDep,
+):
     session.add(team)
     session.commit()
     session.refresh(team)
@@ -17,7 +21,11 @@ def create_team(session: SessionDep, team: Annotated[Team, Body()]):
 
 
 @router.get("/{team_id}", response_model=Team)
-def read_team(session: SessionDep, team_id: Annotated[int, Path()]):
+def read_team(
+    *,
+    team_id: Annotated[int, Path()],
+    session: SessionDep,
+):
     team = session.get(Team, team_id)
     if not team:
         raise HTTPException(
