@@ -54,5 +54,5 @@ This project uses the modern `pyproject.toml` standard for dependency management
 - [ ] db migrations with albemic and sqlmodel 
 - [x] remove hero from mission
 - [x] add mission status: `"active" | "done"`
-- [ ] disable adding heros to mission, if mission is done
-- [ ] add tests
+- [x] disable adding heros to mission, if mission is done
+- [x] add tests
