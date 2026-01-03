@@ -61,8 +61,9 @@ class HeroPublic(HeroBase):
     id: int
 
 
-class HeroPublicWithTeam(HeroPublic):
+class HeroPublicWithTeamMissions(HeroPublic):
     team: TeamPublic | None = None
+    missions: list[MissionPublic] = []
 
 
 class HeroUpdate(SQLModel):

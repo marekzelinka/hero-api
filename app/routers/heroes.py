@@ -7,7 +7,7 @@ from app.db.schema import (
     Hero,
     HeroCreate,
     HeroPublic,
-    HeroPublicWithTeam,
+    HeroPublicWithTeamMissions,
     HeroUpdate,
     Team,
 )
@@ -40,7 +40,7 @@ def read_heroes(
     return heroes
 
 
-@router.get("/{hero_id}", response_model=HeroPublicWithTeam)
+@router.get("/{hero_id}", response_model=HeroPublicWithTeamMissions)
 def read_hero(
     *,
     hero_id: Annotated[int, Path()],
