@@ -89,3 +89,37 @@ async def update_mission(
     session.commit()
     session.refresh(db_mission)
     return db_mission
+
+
+@router.delete("/{mission_id}/heroes/{hero_id}", response_model=MissionPublicWithHeroes)
+def remove_hero_from_mission(
+    *,
+    mission_id: Annotated[int, Path()],
+    hero_id: Annotated[int, Path()],
+    session: SessionDep,
+):
+    mission = session.get(Mission, mission_id)
+    if not mission:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Mission not found"
+        )
+    hero = session.get(Hero, hero_id)
+    if not hero:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Hero not found"
+        )
+    hero_mission_link = session.get(
+        HeroMissionLink,
+        (
+            hero_id,
+            mission_id,
+        ),
+    )
+    if not hero_mission_link:
+        raise HTTPException(
+            status_code=status.HTTP_304_NOT_MODIFIED,
+            detail="Hero wasn't assigned to mission",
+        )
+    session.delete(hero_mission_link)
+    session.commit()
+    return mission
