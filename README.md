@@ -53,6 +53,6 @@ This project uses the modern `pyproject.toml` standard for dependency management
 - [ ] deploy to `fly.io`
 - [ ] db migrations with albemic and sqlmodel 
 - [x] remove hero from mission
-- [ ] add mission status: `"active" | "done"`
+- [x] add mission status: `"active" | "done"`
 - [ ] disable adding heros to mission, if mission is done
 - [ ] add tests

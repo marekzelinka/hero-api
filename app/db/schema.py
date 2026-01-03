@@ -76,6 +76,7 @@ class HeroUpdate(SQLModel):
 
 class MissionBase(SQLModel):
     description: str
+    active: bool = Field(default=True)
 
 
 class Mission(MissionBase, table=True):
@@ -100,3 +101,4 @@ class MissionPublicWithHeroes(MissionPublic):
 
 class MissionUpdate(SQLModel):
     description: str | None = None
+    active: bool | None = None

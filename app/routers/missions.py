@@ -103,6 +103,11 @@ def remove_hero_from_mission(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Mission not found"
         )
+    elif not mission.active:
+        raise HTTPException(
+            status_code=status.HTTP_304_NOT_MODIFIED,
+            detail="Can't remove hero from inactive mission",
+        )
     hero = session.get(Hero, hero_id)
     if not hero:
         raise HTTPException(
