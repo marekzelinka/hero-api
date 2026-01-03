@@ -8,6 +8,7 @@ from app.db.schema import (
     Mission,
     MissionCreate,
     MissionPublic,
+    MissionPublicWithHeroes,
     MissionUpdate,
 )
 from app.db.session import SessionDep
@@ -28,7 +29,21 @@ def create_mission(
     return db_mission
 
 
-@router.put("/{mission_id}/heroes/{hero_id}", response_model=MissionPublic)
+@router.get("/{mission_id}", response_model=MissionPublicWithHeroes)
+def read_mission(
+    *,
+    mission_id: Annotated[int, Path()],
+    session: SessionDep,
+):
+    mission = session.get(Mission, mission_id)
+    if not mission:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Mission not found"
+        )
+    return mission
+
+
+@router.put("/{mission_id}/heroes/{hero_id}", response_model=MissionPublicWithHeroes)
 def assign_hero_to_mission(
     *,
     mission_id: Annotated[int, Path()],
@@ -45,23 +60,14 @@ def assign_hero_to_mission(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Hero not found"
         )
+    if hero in mission.heroes:
+        raise HTTPException(
+            status_code=status.HTTP_304_NOT_MODIFIED,
+            detail="Hero already assigned to mission",
+        )
     hero_mission_link = HeroMissionLink(hero_id=hero_id, mission_id=mission_id)
     session.add(hero_mission_link)
     session.commit()
-    return mission
-
-
-@router.get("/{mission_id}", response_model=MissionPublic)
-def read_mission(
-    *,
-    mission_id: Annotated[int, Path()],
-    session: SessionDep,
-):
-    mission = session.get(Mission, mission_id)
-    if not mission:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Mission not found"
-        )
     return mission
 
 

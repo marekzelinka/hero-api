@@ -93,5 +93,9 @@ class MissionPublic(MissionBase):
     id: int
 
 
+class MissionPublicWithHeroes(MissionPublic):
+    heroes: list[HeroPublic] = []
+
+
 class MissionUpdate(SQLModel):
     description: str | None = None
