@@ -51,7 +51,7 @@ This project uses the modern `pyproject.toml` standard for dependency management
 - [x] public APIs
 - [ ] explore using `neon` as db provider
 - [ ] deploy to `fly.io`
-- [ ] db migrations with albemic and sqlmodel 
+- [x] db migrations with albemic and sqlmodel 
 - [x] remove hero from mission
 - [x] add mission status: `"active" | "done"`
 - [x] disable adding heros to mission, if mission is done
