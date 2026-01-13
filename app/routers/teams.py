@@ -1,3 +1,4 @@
+import uuid
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Body, HTTPException, Path, Query, status
@@ -41,7 +42,7 @@ async def read_teams(
 async def read_team(
     *,
     session: SessionDep,
-    team_id: Annotated[int, Path()],
+    team_id: Annotated[uuid.UUID, Path()],
 ) -> Any:
     team = session.get(Team, team_id)
     if not team:
@@ -55,7 +56,7 @@ async def read_team(
 async def update_team(
     *,
     session: SessionDep,
-    team_id: Annotated[int, Path()],
+    team_id: Annotated[uuid.UUID, Path()],
     team: Annotated[TeamUpdate, Body()],
 ) -> Any:
     db_team = session.get(Team, team_id)
@@ -75,7 +76,7 @@ async def update_team(
 async def delete_team(
     *,
     session: SessionDep,
-    team_id: Annotated[int, Path()],
+    team_id: Annotated[uuid.UUID, Path()],
 ) -> None:
     team = session.get(Team, team_id)
     if not team:

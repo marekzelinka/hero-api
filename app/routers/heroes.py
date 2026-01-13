@@ -1,3 +1,4 @@
+import uuid
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Body, HTTPException, Path, Query, status
@@ -48,7 +49,7 @@ async def read_heroes(
 async def read_hero(
     *,
     session: SessionDep,
-    hero_id: Annotated[int, Path()],
+    hero_id: Annotated[uuid.UUID, Path()],
 ) -> Any:
     hero = session.get(Hero, hero_id)
     if not hero:
@@ -62,7 +63,7 @@ async def read_hero(
 async def update_hero(
     *,
     session: SessionDep,
-    hero_id: Annotated[int, Path()],
+    hero_id: Annotated[uuid.UUID, Path()],
     hero: Annotated[HeroUpdate, Body()],
 ) -> Any:
     db_hero = session.get(Hero, hero_id)
@@ -81,8 +82,8 @@ async def update_hero(
 @router.put("/{hero_id}/team/{team_id}", response_model=HeroPublic)
 async def assign_hero_to_team(
     *,
-    hero_id: Annotated[int, Path()],
-    team_id: Annotated[int, Path()],
+    hero_id: Annotated[uuid.UUID, Path()],
+    team_id: Annotated[uuid.UUID, Path()],
     session: SessionDep,
 ) -> Any:
     hero = session.get(Hero, hero_id)
@@ -105,7 +106,7 @@ async def assign_hero_to_team(
 async def delete_hero(
     *,
     session: SessionDep,
-    hero_id: Annotated[int, Path()],
+    hero_id: Annotated[uuid.UUID, Path()],
 ) -> None:
     hero = session.get(Hero, hero_id)
     if not hero:

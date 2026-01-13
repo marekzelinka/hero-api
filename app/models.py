@@ -1,3 +1,5 @@
+import uuid
+
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -7,7 +9,7 @@ class TeamBase(SQLModel):
 
 
 class Team(TeamBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
 
     heroes: list[Hero] = Relationship(back_populates="team")
 
@@ -17,7 +19,7 @@ class TeamCreate(TeamBase):
 
 
 class TeamPublic(TeamBase):
-    id: int
+    id: uuid.UUID
 
 
 class TeamPublicWithHeroes(TeamPublic):
@@ -30,10 +32,8 @@ class TeamUpdate(SQLModel):
 
 
 class HeroMissionLink(SQLModel, table=True):
-    hero_id: int | None = Field(default=None, foreign_key="hero.id", primary_key=True)
-    mission_id: int | None = Field(
-        default=None, foreign_key="mission.id", primary_key=True
-    )
+    hero_id: uuid.UUID = Field(foreign_key="hero.id", primary_key=True)
+    mission_id: uuid.UUID = Field(foreign_key="mission.id", primary_key=True)
 
 
 class HeroBase(SQLModel):
@@ -41,11 +41,11 @@ class HeroBase(SQLModel):
     secret_name: str
     age: int | None = Field(default=None, index=True)
 
-    team_id: int | None = Field(default=None, foreign_key="team.id")
+    team_id: uuid.UUID | None = Field(default=None, foreign_key="team.id")
 
 
 class Hero(HeroBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
 
     team: Team | None = Relationship(back_populates="heroes")
     missions: list[Mission] = Relationship(
@@ -58,7 +58,7 @@ class HeroCreate(HeroBase):
 
 
 class HeroPublic(HeroBase):
-    id: int
+    id: uuid.UUID
 
 
 class HeroPublicWithTeamMissions(HeroPublic):
@@ -71,7 +71,7 @@ class HeroUpdate(SQLModel):
     secret_name: str | None = None
     age: int | None = None
 
-    team_id: int | None = None
+    team_id: uuid.UUID | None = None
 
 
 class MissionBase(SQLModel):
@@ -80,7 +80,7 @@ class MissionBase(SQLModel):
 
 
 class Mission(MissionBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
 
     heroes: list[Hero] = Relationship(
         back_populates="missions", link_model=HeroMissionLink
@@ -92,7 +92,7 @@ class MissionCreate(MissionBase):
 
 
 class MissionPublic(MissionBase):
-    id: int
+    id: uuid.UUID
 
 
 class MissionPublicWithHeroes(MissionPublic):
@@ -104,6 +104,7 @@ class MissionUpdate(SQLModel):
     active: bool | None = None
 
 
-# Generic message
 class Message(SQLModel):
+    """Models a generic messages, used as a response model in routes."""
+
     message: str

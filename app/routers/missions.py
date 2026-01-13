@@ -1,3 +1,4 @@
+import uuid
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Body, HTTPException, Path, status
@@ -33,7 +34,7 @@ async def create_mission(
 async def read_mission(
     *,
     session: SessionDep,
-    mission_id: Annotated[int, Path()],
+    mission_id: Annotated[uuid.UUID, Path()],
 ) -> Any:
     mission = session.get(Mission, mission_id)
     if not mission:
@@ -47,8 +48,8 @@ async def read_mission(
 async def assign_hero_to_mission(
     *,
     session: SessionDep,
-    mission_id: Annotated[int, Path()],
-    hero_id: Annotated[int, Path()],
+    mission_id: Annotated[uuid.UUID, Path()],
+    hero_id: Annotated[uuid.UUID, Path()],
 ) -> Any:
     mission = session.get(Mission, mission_id)
     if not mission:
@@ -75,7 +76,7 @@ async def assign_hero_to_mission(
 async def update_mission(
     *,
     session: SessionDep,
-    mission_id: Annotated[int, Path()],
+    mission_id: Annotated[uuid.UUID, Path()],
     mission: Annotated[MissionUpdate, Body()],
 ) -> Any:
     db_mission = session.get(Mission, mission_id)
@@ -95,8 +96,8 @@ async def update_mission(
 async def remove_hero_from_mission(
     *,
     session: SessionDep,
-    mission_id: Annotated[int, Path()],
-    hero_id: Annotated[int, Path()],
+    mission_id: Annotated[uuid.UUID, Path()],
+    hero_id: Annotated[uuid.UUID, Path()],
 ) -> None:
     mission = session.get(Mission, mission_id)
     if not mission:
