@@ -1,20 +1,24 @@
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Body, HTTPException, Path, Query, status
 from sqlmodel import select
 
-from app.db.schema import Team, TeamCreate, TeamPublic, TeamPublicWithHeroes, TeamUpdate
-from app.db.session import SessionDep
+from app.deps import SessionDep
+from app.models import Team, TeamCreate, TeamPublic, TeamPublicWithHeroes, TeamUpdate
 
 router = APIRouter(prefix="/teams", tags=["teams"])
 
 
-@router.post("/", response_model=TeamPublic, status_code=status.HTTP_201_CREATED)
-def create_team(
+@router.post(
+    "/",
+    status_code=status.HTTP_201_CREATED,
+    response_model=TeamPublic,
+)
+async def create_team(
     *,
-    team: Annotated[TeamCreate, Body()],
     session: SessionDep,
-):
+    team: Annotated[TeamCreate, Body()],
+) -> Any:
     db_team = Team.model_validate(team)
     session.add(db_team)
     session.commit()
@@ -25,20 +29,20 @@ def create_team(
 @router.get("/", response_model=list[TeamPublic])
 async def read_teams(
     *,
-    offset: Annotated[int, Query()] = 0,
-    limit: Annotated[int, Query(le=100)] = 100,
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(gt=0)] = 100,
     session: SessionDep,
-):
+) -> Any:
     teams = session.exec(select(Team).offset(offset).limit(limit)).all()
     return teams
 
 
 @router.get("/{team_id}", response_model=TeamPublicWithHeroes)
-def read_team(
+async def read_team(
     *,
-    team_id: Annotated[int, Path()],
     session: SessionDep,
-):
+    team_id: Annotated[int, Path()],
+) -> Any:
     team = session.get(Team, team_id)
     if not team:
         raise HTTPException(
@@ -50,10 +54,10 @@ def read_team(
 @router.patch("/{team_id}", response_model=TeamPublic)
 async def update_team(
     *,
+    session: SessionDep,
     team_id: Annotated[int, Path()],
     team: Annotated[TeamUpdate, Body()],
-    session: SessionDep,
-):
+) -> Any:
     db_team = session.get(Team, team_id)
     if not db_team:
         raise HTTPException(
@@ -68,7 +72,11 @@ async def update_team(
 
 
 @router.delete("/{team_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_team(*, team_id: Annotated[int, Path()], session: SessionDep):
+async def delete_team(
+    *,
+    session: SessionDep,
+    team_id: Annotated[int, Path()],
+) -> None:
     team = session.get(Team, team_id)
     if not team:
         raise HTTPException(
@@ -76,3 +84,4 @@ async def delete_team(*, team_id: Annotated[int, Path()], session: SessionDep):
         )
     session.delete(team)
     session.commit()
+    return None

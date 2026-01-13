@@ -1,9 +1,10 @@
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Body, HTTPException, Path, Query, status
 from sqlmodel import select
 
-from app.db.schema import (
+from app.deps import SessionDep
+from app.models import (
     Hero,
     HeroCreate,
     HeroPublic,
@@ -11,17 +12,20 @@ from app.db.schema import (
     HeroUpdate,
     Team,
 )
-from app.db.session import SessionDep
 
 router = APIRouter(prefix="/heroes", tags=["heroes"])
 
 
-@router.post("/", response_model=HeroPublic, status_code=status.HTTP_201_CREATED)
-def create_hero(
+@router.post(
+    "/",
+    status_code=status.HTTP_201_CREATED,
+    response_model=HeroPublic,
+)
+async def create_hero(
     *,
-    hero: Annotated[HeroCreate, Body()],
     session: SessionDep,
-):
+    hero: Annotated[HeroCreate, Body()],
+) -> Any:
     db_hero = Hero.model_validate(hero)
     session.add(db_hero)
     session.commit()
@@ -30,22 +34,22 @@ def create_hero(
 
 
 @router.get("/", response_model=list[HeroPublic])
-def read_heroes(
+async def read_heroes(
     *,
-    skip: Annotated[int, Query()] = 0,
-    limit: Annotated[int, Query()] = 10,
     session: SessionDep,
-):
-    heroes = session.exec(select(Hero).offset(skip).limit(limit)).all()
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(gt=0)] = 100,
+) -> Any:
+    heroes = session.exec(select(Hero).offset(offset).limit(limit)).all()
     return heroes
 
 
 @router.get("/{hero_id}", response_model=HeroPublicWithTeamMissions)
-def read_hero(
+async def read_hero(
     *,
-    hero_id: Annotated[int, Path()],
     session: SessionDep,
-):
+    hero_id: Annotated[int, Path()],
+) -> Any:
     hero = session.get(Hero, hero_id)
     if not hero:
         raise HTTPException(
@@ -55,12 +59,12 @@ def read_hero(
 
 
 @router.patch("/{hero_id}", response_model=HeroPublic)
-def update_hero(
+async def update_hero(
     *,
+    session: SessionDep,
     hero_id: Annotated[int, Path()],
     hero: Annotated[HeroUpdate, Body()],
-    session: SessionDep,
-):
+) -> Any:
     db_hero = session.get(Hero, hero_id)
     if not db_hero:
         raise HTTPException(
@@ -75,12 +79,12 @@ def update_hero(
 
 
 @router.put("/{hero_id}/team/{team_id}", response_model=HeroPublic)
-def assign_hero_to_team(
+async def assign_hero_to_team(
     *,
     hero_id: Annotated[int, Path()],
     team_id: Annotated[int, Path()],
     session: SessionDep,
-):
+) -> Any:
     hero = session.get(Hero, hero_id)
     if not hero:
         raise HTTPException(
@@ -98,11 +102,11 @@ def assign_hero_to_team(
 
 
 @router.delete("/{hero_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_hero(
+async def delete_hero(
     *,
-    hero_id: Annotated[int, Path()],
     session: SessionDep,
-):
+    hero_id: Annotated[int, Path()],
+) -> None:
     hero = session.get(Hero, hero_id)
     if not hero:
         raise HTTPException(
@@ -110,3 +114,4 @@ def delete_hero(
         )
     session.delete(hero)
     session.commit()
+    return None

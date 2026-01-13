@@ -102,3 +102,8 @@ class MissionPublicWithHeroes(MissionPublic):
 class MissionUpdate(SQLModel):
     description: str | None = None
     active: bool | None = None
+
+
+# Generic message
+class Message(SQLModel):
+    message: str

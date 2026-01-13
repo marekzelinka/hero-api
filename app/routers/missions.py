@@ -1,8 +1,9 @@
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Body, HTTPException, Path, status
 
-from app.db.schema import (
+from app.deps import SessionDep
+from app.models import (
     Hero,
     HeroMissionLink,
     Mission,
@@ -11,17 +12,16 @@ from app.db.schema import (
     MissionPublicWithHeroes,
     MissionUpdate,
 )
-from app.db.session import SessionDep
 
 router = APIRouter(prefix="/missions", tags=["missions"])
 
 
-@router.post("/", response_model=MissionPublic, status_code=status.HTTP_201_CREATED)
-def create_mission(
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=MissionPublic)
+async def create_mission(
     *,
-    mission: Annotated[MissionCreate, Body()],
     session: SessionDep,
-):
+    mission: Annotated[MissionCreate, Body()],
+) -> Any:
     db_mission = Mission.model_validate(mission)
     session.add(db_mission)
     session.commit()
@@ -30,11 +30,11 @@ def create_mission(
 
 
 @router.get("/{mission_id}", response_model=MissionPublicWithHeroes)
-def read_mission(
+async def read_mission(
     *,
-    mission_id: Annotated[int, Path()],
     session: SessionDep,
-):
+    mission_id: Annotated[int, Path()],
+) -> Any:
     mission = session.get(Mission, mission_id)
     if not mission:
         raise HTTPException(
@@ -44,12 +44,12 @@ def read_mission(
 
 
 @router.put("/{mission_id}/heroes/{hero_id}", response_model=MissionPublicWithHeroes)
-def assign_hero_to_mission(
+async def assign_hero_to_mission(
     *,
+    session: SessionDep,
     mission_id: Annotated[int, Path()],
     hero_id: Annotated[int, Path()],
-    session: SessionDep,
-):
+) -> Any:
     mission = session.get(Mission, mission_id)
     if not mission:
         raise HTTPException(
@@ -74,10 +74,10 @@ def assign_hero_to_mission(
 @router.patch("/{mission_id}", response_model=MissionPublic)
 async def update_mission(
     *,
+    session: SessionDep,
     mission_id: Annotated[int, Path()],
     mission: Annotated[MissionUpdate, Body()],
-    session: SessionDep,
-):
+) -> Any:
     db_mission = session.get(Mission, mission_id)
     if not db_mission:
         raise HTTPException(
@@ -91,13 +91,13 @@ async def update_mission(
     return db_mission
 
 
-@router.delete("/{mission_id}/heroes/{hero_id}", response_model=MissionPublicWithHeroes)
-def remove_hero_from_mission(
+@router.delete("/{mission_id}/heroes/{hero_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def remove_hero_from_mission(
     *,
+    session: SessionDep,
     mission_id: Annotated[int, Path()],
     hero_id: Annotated[int, Path()],
-    session: SessionDep,
-):
+) -> None:
     mission = session.get(Mission, mission_id)
     if not mission:
         raise HTTPException(
@@ -127,4 +127,4 @@ def remove_hero_from_mission(
         )
     session.delete(hero_mission_link)
     session.commit()
-    return mission
+    return None
