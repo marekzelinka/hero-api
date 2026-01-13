@@ -1,12 +1,10 @@
 import logging
-from contextlib import asynccontextmanager
 from typing import Any, TypedDict
 
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import config
-from app.core.db import create_db_and_tables
 from app.deps import SessionDep
 from app.routers import heroes, missions, teams
 
@@ -15,14 +13,7 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
 )
 
-
-@asynccontextmanager
-async def lifespan(_app: FastAPI):
-    create_db_and_tables()
-    yield
-
-
-app = FastAPI(title="Hero API", lifespan=lifespan)
+app = FastAPI(title="Hero API")
 
 # Set all CORS enabled origins
 if config.all_cors_origins:
