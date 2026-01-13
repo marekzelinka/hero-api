@@ -69,6 +69,7 @@ async def assign_hero_to_mission(
     hero_mission_link = HeroMissionLink(hero_id=hero_id, mission_id=mission_id)
     session.add(hero_mission_link)
     await session.commit()
+    await session.refresh(mission)
     return mission
 
 

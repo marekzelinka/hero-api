@@ -11,7 +11,10 @@ class TeamBase(SQLModel):
 class Team(TeamBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
 
-    heroes: list[Hero] = Relationship(back_populates="team")
+    heroes: list[Hero] = Relationship(
+        back_populates="team",
+        sa_relationship_kwargs={"lazy": "selectin"},
+    )
 
 
 class TeamCreate(TeamBase):
@@ -51,7 +54,10 @@ class HeroBase(SQLModel):
 class Hero(HeroBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
 
-    team: Team | None = Relationship(back_populates="heroes")
+    team: Team | None = Relationship(
+        back_populates="heroes",
+        sa_relationship_kwargs={"lazy": "selectin"},
+    )
     missions: list[Mission] = Relationship(
         back_populates="heroes",
         link_model=HeroMissionLink,
@@ -89,7 +95,9 @@ class Mission(MissionBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
 
     heroes: list[Hero] = Relationship(
-        back_populates="missions", link_model=HeroMissionLink
+        back_populates="missions",
+        link_model=HeroMissionLink,
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
 
 
