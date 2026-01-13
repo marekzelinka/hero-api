@@ -1,6 +1,6 @@
-# Hero DB
+# Hero DB API
 
-This project is represents an REST API for teams of heroes, that can be assigned to missions.
+A high-performance API for managing superheros, superhero teams and missions using **FastAPI**, **Async SQLModel** with **alembic**.
 
 ## Features
 
