@@ -32,8 +32,12 @@ class TeamUpdate(SQLModel):
 
 
 class HeroMissionLink(SQLModel, table=True):
-    hero_id: uuid.UUID = Field(foreign_key="hero.id", primary_key=True)
-    mission_id: uuid.UUID = Field(foreign_key="mission.id", primary_key=True)
+    hero_id: uuid.UUID | None = Field(
+        default=None, foreign_key="hero.id", primary_key=True
+    )
+    mission_id: uuid.UUID | None = Field(
+        default=None, foreign_key="mission.id", primary_key=True
+    )
 
 
 class HeroBase(SQLModel):
@@ -49,7 +53,9 @@ class Hero(HeroBase, table=True):
 
     team: Team | None = Relationship(back_populates="heroes")
     missions: list[Mission] = Relationship(
-        back_populates="heroes", link_model=HeroMissionLink
+        back_populates="heroes",
+        link_model=HeroMissionLink,
+        sa_relationship_kwargs={"lazy": "selectin"},
     )
 
 
