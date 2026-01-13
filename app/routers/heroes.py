@@ -1,5 +1,6 @@
 import uuid
-from typing import Annotated, Any
+from collections.abc import Sequence
+from typing import Annotated
 
 from fastapi import APIRouter, Body, HTTPException, Path, Query, status
 from sqlmodel import select
@@ -26,7 +27,7 @@ async def create_hero(
     *,
     session: SessionDep,
     hero: Annotated[HeroCreate, Body()],
-) -> Any:
+) -> Hero:
     db_hero = Hero.model_validate(hero)
     session.add(db_hero)
     await session.commit()
@@ -40,7 +41,7 @@ async def read_heroes(
     session: SessionDep,
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(gt=0)] = 100,
-) -> Any:
+) -> Sequence[Hero]:
     results = await session.exec(select(Hero).offset(offset).limit(limit))
     return results.all()
 
@@ -50,7 +51,7 @@ async def read_hero(
     *,
     session: SessionDep,
     hero_id: Annotated[uuid.UUID, Path()],
-) -> Any:
+) -> Hero:
     hero = await session.get(Hero, hero_id)
     if not hero:
         raise HTTPException(
@@ -65,7 +66,7 @@ async def update_hero(
     session: SessionDep,
     hero_id: Annotated[uuid.UUID, Path()],
     hero: Annotated[HeroUpdate, Body()],
-) -> Any:
+) -> Hero:
     db_hero = await session.get(Hero, hero_id)
     if not db_hero:
         raise HTTPException(
@@ -85,7 +86,7 @@ async def assign_hero_to_team(
     session: SessionDep,
     hero_id: Annotated[uuid.UUID, Path()],
     team_id: Annotated[uuid.UUID, Path()],
-) -> Any:
+) -> Hero:
     hero = await session.get(Hero, hero_id)
     if not hero:
         raise HTTPException(

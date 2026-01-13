@@ -1,5 +1,5 @@
 import uuid
-from typing import Annotated, Any
+from typing import Annotated
 
 from fastapi import APIRouter, Body, HTTPException, Path, status
 
@@ -22,7 +22,7 @@ async def create_mission(
     *,
     session: SessionDep,
     mission: Annotated[MissionCreate, Body()],
-) -> Any:
+) -> Mission:
     db_mission = Mission.model_validate(mission)
     session.add(db_mission)
     await session.commit()
@@ -35,7 +35,7 @@ async def read_mission(
     *,
     session: SessionDep,
     mission_id: Annotated[uuid.UUID, Path()],
-) -> Any:
+) -> Mission:
     mission = await session.get(Mission, mission_id)
     if not mission:
         raise HTTPException(
@@ -50,7 +50,7 @@ async def assign_hero_to_mission(
     session: SessionDep,
     mission_id: Annotated[uuid.UUID, Path()],
     hero_id: Annotated[uuid.UUID, Path()],
-) -> Any:
+) -> Mission:
     mission = await session.get(Mission, mission_id)
     if not mission:
         raise HTTPException(
@@ -79,7 +79,7 @@ async def update_mission(
     session: SessionDep,
     mission_id: Annotated[uuid.UUID, Path()],
     mission: Annotated[MissionUpdate, Body()],
-) -> Any:
+) -> Mission:
     db_mission = await session.get(Mission, mission_id)
     if not db_mission:
         raise HTTPException(

@@ -1,5 +1,6 @@
 import uuid
-from typing import Annotated, Any
+from collections.abc import Sequence
+from typing import Annotated
 
 from fastapi import APIRouter, Body, HTTPException, Path, Query, status
 from sqlmodel import select
@@ -19,7 +20,7 @@ async def create_team(
     *,
     session: SessionDep,
     team: Annotated[TeamCreate, Body()],
-) -> Any:
+) -> Team:
     db_team = Team.model_validate(team)
     session.add(db_team)
     await session.commit()
@@ -33,7 +34,7 @@ async def read_teams(
     session: SessionDep,
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(gt=0)] = 100,
-) -> Any:
+) -> Sequence[Team]:
     results = await session.exec(select(Team).offset(offset).limit(limit))
     return results.all()
 
@@ -43,7 +44,7 @@ async def read_team(
     *,
     session: SessionDep,
     team_id: Annotated[uuid.UUID, Path()],
-) -> Any:
+) -> Team:
     team = await session.get(Team, team_id)
     if not team:
         raise HTTPException(
@@ -58,7 +59,7 @@ async def update_team(
     session: SessionDep,
     team_id: Annotated[uuid.UUID, Path()],
     team: Annotated[TeamUpdate, Body()],
-) -> Any:
+) -> Team:
     db_team = await session.get(Team, team_id)
     if not db_team:
         raise HTTPException(
