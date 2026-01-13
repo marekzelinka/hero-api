@@ -44,7 +44,7 @@ async def read_team(
     session: SessionDep,
     team_id: Annotated[uuid.UUID, Path()],
 ) -> Any:
-    team = session.get(Team, team_id)
+    team = await session.get(Team, team_id)
     if not team:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Team not found"
