@@ -13,7 +13,11 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
 )
 
-app = FastAPI(title="Hero API")
+app = FastAPI(
+    title="Hero API",
+    summary="A high-performance API for managing superheros, superhero teams and missions.",
+    version="1.0.0",
+)
 
 # Set all CORS enabled origins
 if config.all_cors_origins:
