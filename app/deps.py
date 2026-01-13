@@ -1,15 +1,15 @@
-from collections.abc import Generator
+from collections.abc import AsyncGenerator
 from typing import Annotated
 
 from fastapi import Depends
-from sqlmodel import Session
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.core.db import engine
 
 
-def get_session() -> Generator[Session]:
-    with Session(engine) as session:
+async def get_session() -> AsyncGenerator[AsyncSession]:
+    async with AsyncSession(engine) as session:
         yield session
 
 
-SessionDep = Annotated[Session, Depends(get_session)]
+SessionDep = Annotated[AsyncSession, Depends(get_session)]

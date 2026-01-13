@@ -20,8 +20,8 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    log_level: str = "INFO"
-    database_url: str = "sqlite:///./db.sqlite3"
+    log_level: str
+    database_url: str
     cors_origins: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = []
 
     @computed_field
@@ -30,4 +30,4 @@ class Settings(BaseSettings):
         return [str(origin).rstrip("/") for origin in self.cors_origins]
 
 
-config = Settings()
+config = Settings.model_validate({})

@@ -25,8 +25,8 @@ async def create_mission(
 ) -> Any:
     db_mission = Mission.model_validate(mission)
     session.add(db_mission)
-    session.commit()
-    session.refresh(db_mission)
+    await session.commit()
+    await session.refresh(db_mission)
     return db_mission
 
 
@@ -36,7 +36,7 @@ async def read_mission(
     session: SessionDep,
     mission_id: Annotated[uuid.UUID, Path()],
 ) -> Any:
-    mission = session.get(Mission, mission_id)
+    mission = await session.get(Mission, mission_id)
     if not mission:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Mission not found"
@@ -51,12 +51,12 @@ async def assign_hero_to_mission(
     mission_id: Annotated[uuid.UUID, Path()],
     hero_id: Annotated[uuid.UUID, Path()],
 ) -> Any:
-    mission = session.get(Mission, mission_id)
+    mission = await session.get(Mission, mission_id)
     if not mission:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Mission not found"
         )
-    hero = session.get(Hero, hero_id)
+    hero = await session.get(Hero, hero_id)
     if not hero:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Hero not found"
@@ -68,7 +68,7 @@ async def assign_hero_to_mission(
         )
     hero_mission_link = HeroMissionLink(hero_id=hero_id, mission_id=mission_id)
     session.add(hero_mission_link)
-    session.commit()
+    await session.commit()
     return mission
 
 
@@ -79,7 +79,7 @@ async def update_mission(
     mission_id: Annotated[uuid.UUID, Path()],
     mission: Annotated[MissionUpdate, Body()],
 ) -> Any:
-    db_mission = session.get(Mission, mission_id)
+    db_mission = await session.get(Mission, mission_id)
     if not db_mission:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="mission not found"
@@ -87,8 +87,8 @@ async def update_mission(
     mission_data = mission.model_dump(exclude_unset=True)
     db_mission.sqlmodel_update(mission_data)
     session.add(db_mission)
-    session.commit()
-    session.refresh(db_mission)
+    await session.commit()
+    await session.refresh(db_mission)
     return db_mission
 
 
@@ -99,7 +99,7 @@ async def remove_hero_from_mission(
     mission_id: Annotated[uuid.UUID, Path()],
     hero_id: Annotated[uuid.UUID, Path()],
 ) -> None:
-    mission = session.get(Mission, mission_id)
+    mission = await session.get(Mission, mission_id)
     if not mission:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Mission not found"
@@ -109,12 +109,12 @@ async def remove_hero_from_mission(
             status_code=status.HTTP_304_NOT_MODIFIED,
             detail="Can't remove hero from inactive mission",
         )
-    hero = session.get(Hero, hero_id)
+    hero = await session.get(Hero, hero_id)
     if not hero:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Hero not found"
         )
-    hero_mission_link = session.get(
+    hero_mission_link = await session.get(
         HeroMissionLink,
         (
             hero_id,
@@ -126,6 +126,6 @@ async def remove_hero_from_mission(
             status_code=status.HTTP_304_NOT_MODIFIED,
             detail="Hero wasn't assigned to mission",
         )
-    session.delete(hero_mission_link)
-    session.commit()
+    await session.delete(hero_mission_link)
+    await session.commit()
     return None

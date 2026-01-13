@@ -22,20 +22,20 @@ async def create_team(
 ) -> Any:
     db_team = Team.model_validate(team)
     session.add(db_team)
-    session.commit()
-    session.refresh(db_team)
+    await session.commit()
+    await session.refresh(db_team)
     return db_team
 
 
 @router.get("/", response_model=list[TeamPublic])
 async def read_teams(
     *,
+    session: SessionDep,
     offset: Annotated[int, Query(ge=0)] = 0,
     limit: Annotated[int, Query(gt=0)] = 100,
-    session: SessionDep,
 ) -> Any:
-    teams = session.exec(select(Team).offset(offset).limit(limit)).all()
-    return teams
+    results = await session.exec(select(Team).offset(offset).limit(limit))
+    return results.all()
 
 
 @router.get("/{team_id}", response_model=TeamPublicWithHeroes)
@@ -59,7 +59,7 @@ async def update_team(
     team_id: Annotated[uuid.UUID, Path()],
     team: Annotated[TeamUpdate, Body()],
 ) -> Any:
-    db_team = session.get(Team, team_id)
+    db_team = await session.get(Team, team_id)
     if not db_team:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Team not found"
@@ -67,8 +67,8 @@ async def update_team(
     team_data = team.model_dump(exclude_unset=True)
     db_team.sqlmodel_update(team_data)
     session.add(db_team)
-    session.commit()
-    session.refresh(db_team)
+    await session.commit()
+    await session.refresh(db_team)
     return db_team
 
 
@@ -78,11 +78,11 @@ async def delete_team(
     session: SessionDep,
     team_id: Annotated[uuid.UUID, Path()],
 ) -> None:
-    team = session.get(Team, team_id)
+    team = await session.get(Team, team_id)
     if not team:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Team not found"
         )
-    session.delete(team)
-    session.commit()
+    await session.delete(team)
+    await session.commit()
     return None
