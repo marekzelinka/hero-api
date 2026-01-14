@@ -59,7 +59,12 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata, render_as_batch=True)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        render_as_batch=True,
+        user_module_prefix="sqlmodel.sql.sqltypes.",
+    )
 
     with context.begin_transaction():
         context.run_migrations()

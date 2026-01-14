@@ -1,8 +1,8 @@
 """init
 
-Revision ID: f4473942bd3b
+Revision ID: a884ec7e85e5
 Revises: 
-Create Date: 2026-01-13 19:48:21.164625
+Create Date: 2026-01-14 13:10:14.080056
 
 """
 from typing import Sequence, Union
@@ -13,7 +13,7 @@ import sqlmodel.sql.sqltypes
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'f4473942bd3b'
+revision: str = 'a884ec7e85e5'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -26,7 +26,7 @@ def upgrade() -> None:
     sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('active', sa.Boolean(), nullable=False),
     sa.Column('id', sa.Uuid(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_mission'))
     )
     with op.batch_alter_table('mission', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_mission_id'), ['id'], unique=False)
@@ -35,7 +35,7 @@ def upgrade() -> None:
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('headquarters', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('id', sa.Uuid(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_team'))
     )
     with op.batch_alter_table('team', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_team_id'), ['id'], unique=False)
@@ -47,8 +47,8 @@ def upgrade() -> None:
     sa.Column('age', sa.Integer(), nullable=True),
     sa.Column('team_id', sa.Uuid(), nullable=True),
     sa.Column('id', sa.Uuid(), nullable=False),
-    sa.ForeignKeyConstraint(['team_id'], ['team.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['team_id'], ['team.id'], name=op.f('fk_hero_team_id_team')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_hero'))
     )
     with op.batch_alter_table('hero', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_hero_age'), ['age'], unique=False)
@@ -58,9 +58,9 @@ def upgrade() -> None:
     op.create_table('heromissionlink',
     sa.Column('hero_id', sa.Uuid(), nullable=False),
     sa.Column('mission_id', sa.Uuid(), nullable=False),
-    sa.ForeignKeyConstraint(['hero_id'], ['hero.id'], ),
-    sa.ForeignKeyConstraint(['mission_id'], ['mission.id'], ),
-    sa.PrimaryKeyConstraint('hero_id', 'mission_id')
+    sa.ForeignKeyConstraint(['hero_id'], ['hero.id'], name=op.f('fk_heromissionlink_hero_id_hero')),
+    sa.ForeignKeyConstraint(['mission_id'], ['mission.id'], name=op.f('fk_heromissionlink_mission_id_mission')),
+    sa.PrimaryKeyConstraint('hero_id', 'mission_id', name=op.f('pk_heromissionlink'))
     )
     # ### end Alembic commands ###
 
