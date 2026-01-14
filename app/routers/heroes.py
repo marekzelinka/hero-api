@@ -18,11 +18,7 @@ from app.models import (
 router = APIRouter(prefix="/heroes", tags=["heroes"])
 
 
-@router.post(
-    "/",
-    status_code=status.HTTP_201_CREATED,
-    response_model=HeroPublic,
-)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=HeroPublic)
 async def create_hero(
     *,
     session: SessionDep,
@@ -116,4 +112,3 @@ async def delete_hero(
         )
     await session.delete(hero)
     await session.commit()
-    return None

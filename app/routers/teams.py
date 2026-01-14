@@ -11,11 +11,7 @@ from app.models import Team, TeamCreate, TeamPublic, TeamPublicWithHeroes, TeamU
 router = APIRouter(prefix="/teams", tags=["teams"])
 
 
-@router.post(
-    "/",
-    status_code=status.HTTP_201_CREATED,
-    response_model=TeamPublic,
-)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=TeamPublic)
 async def create_team(
     *,
     session: SessionDep,
@@ -86,4 +82,3 @@ async def delete_team(
         )
     await session.delete(team)
     await session.commit()
-    return None

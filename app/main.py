@@ -1,5 +1,5 @@
 import logging
-from typing import Any, TypedDict
+from dataclasses import dataclass
 
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -36,12 +36,17 @@ app.include_router(heroes.router)
 app.include_router(missions.router)
 
 
+@dataclass
+class HealthCheck:
+    status: str
+
+
 @app.get(
     "/health",
     tags=["status"],
     summary="Perform a Health Check",
     status_code=status.HTTP_200_OK,
-    response_model=TypedDict("Health", {"status": str}),
+    response_model=HealthCheck,
 )
-async def read_health(*, _session: SessionDep) -> Any:
-    return {"status": "ok"}
+async def read_health(*, _session: SessionDep) -> HealthCheck:
+    return HealthCheck(status="ok")

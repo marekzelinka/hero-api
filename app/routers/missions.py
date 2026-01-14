@@ -129,4 +129,3 @@ async def remove_hero_from_mission(
         )
     await session.delete(hero_mission_link)
     await session.commit()
-    return None

@@ -9,7 +9,6 @@ wheels/
 # Virtual environments
 .venv
 
-# App specific
 .env
 *.db
 *.db-journal

@@ -7,9 +7,6 @@ dev:
 test:
     uv run pytest
 
-db-seed:
-    uv run seed_db.py
-
 typecheck:
     uv run ty check
 
