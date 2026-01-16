@@ -7,7 +7,7 @@ from app.models import Hero
 
 
 @pytest.mark.asyncio
-async def test_create_hero(client: AsyncClient):
+async def test_create_hero(client: AsyncClient) -> None:
     r = await client.post(
         "/heroes/", json={"name": "Deadpond", "secret_name": "Dive Wilson"}
     )
@@ -20,14 +20,14 @@ async def test_create_hero(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_create_hero_incomplete(client: AsyncClient):
+async def test_create_hero_incomplete(client: AsyncClient) -> None:
     # Falis validation because of missing secret_name in json
     r = await client.post("/heroes/", json={"name": "Deadpond"})
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
 @pytest.mark.asyncio
-async def test_create_hero_invalid(client: AsyncClient):
+async def test_create_hero_invalid(client: AsyncClient) -> None:
     r = await client.post(
         "/heroes/",
         json={
@@ -39,7 +39,7 @@ async def test_create_hero_invalid(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_read_heroes(session: AsyncSession, client: AsyncClient):
+async def test_read_heroes(session: AsyncSession, client: AsyncClient) -> None:
     hero_1 = Hero(name="Deadpond", secret_name="Dive Wilson")
     session.add(hero_1)
     hero_2 = Hero(name="Rusty-Max", secret_name="Tommy Sharp", age=48)
@@ -68,7 +68,7 @@ async def test_read_heroes(session: AsyncSession, client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_read_hero(session: AsyncSession, client: AsyncClient):
+async def test_read_hero(session: AsyncSession, client: AsyncClient) -> None:
     hero_1 = Hero(name="Deadpond", secret_name="Dive Wilson")
     session.add(hero_1)
     await session.commit()
@@ -84,7 +84,7 @@ async def test_read_hero(session: AsyncSession, client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_update_hero(session: AsyncSession, client: AsyncClient):
+async def test_update_hero(session: AsyncSession, client: AsyncClient) -> None:
     hero_1 = Hero(name="Deadpond", secret_name="Dive Wilson")
     session.add(hero_1)
     await session.commit()
@@ -99,7 +99,7 @@ async def test_update_hero(session: AsyncSession, client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_delete_hero(session: AsyncSession, client: AsyncClient):
+async def test_delete_hero(session: AsyncSession, client: AsyncClient) -> None:
     hero_1 = Hero(name="Deadpond", secret_name="Dive Wilson")
     session.add(hero_1)
     await session.commit()

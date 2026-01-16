@@ -15,7 +15,7 @@ logging.basicConfig(
 
 app = FastAPI(
     title="Hero API",
-    summary="A high-performance API for managing superheros, superhero teams and missions.",
+    summary="A high-performance API for managing superheros.",
     version="1.0.0",
 )
 

@@ -1,13 +1,15 @@
-from typing import Annotated, Any
+from typing import Annotated
 
 from pydantic import AnyUrl, BeforeValidator, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+type CorsInput = str | list[str] | None
 
-def parse_cors(v: Any) -> list[str] | str:
+
+def parse_cors(v: CorsInput) -> list[str] | str:
     if isinstance(v, str) and not v.startswith("["):
         return [i.strip() for i in v.split(",") if i.strip()]
-    elif isinstance(v, list | str):
+    if isinstance(v, list | str):
         return v
     raise ValueError(v)
 
