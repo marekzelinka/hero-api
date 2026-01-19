@@ -128,6 +128,10 @@ class MissionUpdate(SQLModel):
     active: bool | None = None
 
 
+class HealthCheck(SQLModel):
+    status: str
+
+
 class Message(SQLModel):
     """Models a generic messages, used as a response model in routes."""
 

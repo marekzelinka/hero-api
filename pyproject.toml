@@ -11,7 +11,6 @@ dependencies = [
     "httpx>=0.28.1",
     "pydantic>=2.12.5",
     "pydantic-settings>=2.12.0",
-    "slowapi>=0.1.9",
     "sqlalchemy>=2.0.45",
     "sqlmodel>=0.0.31",
     "uvicorn[standard]>=0.40.0",
@@ -34,28 +33,19 @@ exclude = ["alembic/versions"]
 
 [tool.ruff.lint]
 select = [
-    "F",     # Pyflakes: Basic error detection (e.g., unused variables, undefined names)
-    "E",     # pycodestyle errors: Standard PEP 8 formatting and logic errors
-    "W",     # pycodestyle warnings: Non-critical style issues
-    "I",     # isort: Ensures imports are consistently sorted and grouped
-    "UP",    # pyupgrade: Forces modern syntax (e.g., converts 'Union' to '|' automatically)
-    "B",     # flake8-bugbear: Finds common design flaws and potential runtime bugs
-    "UP",    # pyupgrade: Forces modern syntax (e.g., converts 'Union' to '|' automatically)
-    "ARG001", # unused arguments in functions
-    "T201",   # print statements are not allowed
-    "ASYNC", # flake8-async: Essential for async code; prevents blocking calls in async def
-    "ANN",   # flake8-annotations: Enforces type hints for all function arguments and returns
-    "FA",    # flake8-future-annotations: Ensures code uses the most modern typing syntax
-    "SIM",   # flake8-simplify: Suggests cleaner, more readable Pythonic logic
-    "RET",   # flake8-return: Enforces consistent and simplified return statement patterns
-    "PTH",   # flake8-use-pathlib: Replaces legacy 'os.path' with modern 'pathlib' objects
-    "S",     # flake8-bandit: Checks for security issues (e.g., hardcoded passwords, unsafe parsing)
-    "C4",    # flake8-comprehensions: Optimizes list/dict/set comprehension usage
-    "TID",   # flake8-tidy-imports: Helps maintain clean, absolute import structures
+    "E", "F",     # Default Error & Pyflakes
+    "RUF",        # Ruff-specific rules
+    "W",          # pycodestyle warnings
+    "C4",         # flake8-comprehensions
+    "UP",         # pyupgrade
+    "ARG001",     # unused arguments in functions
+    "ANN",        # flake8-annotations (Strict type hinting)
+    "UP",         # pyupgrade (Newest type syntax: e.g., int | None)
+    "B",          # flake8-bugbear (Common logic errors)
+    "I",          # isort (Import sorting)
+    "FAST",       # FastAPI,
+    "ASYNC",      # flake8-async (crucial for FastAPI/Async SQLAlchemy)
 ]
-
-[tool.ruff.lint.flake8-type-checking]
-strict = true
 
 [tool.ruff.lint.per-file-ignores]
 # IGNORE RULES FOR TESTS

@@ -30,21 +30,7 @@ async def create_mission(
     return db_mission
 
 
-@router.get("/{mission_id}", response_model=MissionPublicWithHeroes)
-async def read_mission(
-    *,
-    session: SessionDep,
-    mission_id: Annotated[uuid.UUID, Path()],
-) -> Mission:
-    mission = await session.get(Mission, mission_id)
-    if not mission:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Mission not found"
-        )
-    return mission
-
-
-@router.put("/{mission_id}/heroes/{hero_id}", response_model=MissionPublicWithHeroes)
+@router.post("/{mission_id}/heroes/{hero_id}", response_model=MissionPublicWithHeroes)
 async def assign_hero_to_mission(
     *,
     session: SessionDep,
@@ -70,6 +56,20 @@ async def assign_hero_to_mission(
     session.add(hero_mission_link)
     await session.commit()
     await session.refresh(mission)
+    return mission
+
+
+@router.get("/{mission_id}", response_model=MissionPublicWithHeroes)
+async def read_mission(
+    *,
+    session: SessionDep,
+    mission_id: Annotated[uuid.UUID, Path()],
+) -> Mission:
+    mission = await session.get(Mission, mission_id)
+    if not mission:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Mission not found"
+        )
     return mission
 
 

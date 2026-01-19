@@ -74,7 +74,7 @@ async def test_read_hero(session: AsyncSession, client: AsyncClient) -> None:
     await session.commit()
     await session.refresh(hero_1)
 
-    r = await client.get(f"/heroes/{str(hero_1.id)}")
+    r = await client.get(f"/heroes/{hero_1.id!s}")
     assert r.status_code == status.HTTP_200_OK
     data = r.json()
     assert data["name"] == hero_1.name

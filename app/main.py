@@ -1,17 +1,10 @@
-import logging
-from dataclasses import dataclass
-
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api import api_router
 from app.core.config import config
 from app.deps import SessionDep
-from app.routers import heroes, missions, teams
-
-logging.basicConfig(
-    level=config.log_level,
-    format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
-)
+from app.models import HealthCheck
 
 app = FastAPI(
     title="Hero API",
@@ -31,14 +24,7 @@ if config.all_cors_origins:
     )
 
 
-app.include_router(teams.router)
-app.include_router(heroes.router)
-app.include_router(missions.router)
-
-
-@dataclass
-class HealthCheck:
-    status: str
+app.include_router(api_router)
 
 
 @app.get(

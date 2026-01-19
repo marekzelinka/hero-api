@@ -3,10 +3,8 @@ from typing import Annotated
 from pydantic import AnyUrl, BeforeValidator, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-type CorsInput = str | list[str] | None
 
-
-def parse_cors(v: CorsInput) -> list[str] | str:
+def parse_cors(v: str | list[str] | None) -> list[str] | str:
     if isinstance(v, str) and not v.startswith("["):
         return [i.strip() for i in v.split(",") if i.strip()]
     if isinstance(v, list | str):
@@ -22,7 +20,6 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    log_level: str
     database_url: str
     cors_origins: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = []
 

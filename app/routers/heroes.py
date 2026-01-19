@@ -76,7 +76,7 @@ async def update_hero(
     return db_hero
 
 
-@router.put("/{hero_id}/team/{team_id}", response_model=HeroPublic)
+@router.patch("/{hero_id}/team/{team_id}", response_model=HeroPublic)
 async def assign_hero_to_team(
     *,
     session: SessionDep,
