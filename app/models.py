@@ -129,6 +129,8 @@ class MissionUpdate(SQLModel):
 
 
 class HealthCheck(SQLModel):
+    """Models a status check for our /health endpoint."""
+
     status: str
 
 

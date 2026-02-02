@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import api_router
@@ -27,12 +27,6 @@ if config.all_cors_origins:
 app.include_router(api_router)
 
 
-@app.get(
-    "/health",
-    tags=["status"],
-    summary="Perform a Health Check",
-    status_code=status.HTTP_200_OK,
-    response_model=HealthCheck,
-)
+@app.get("/health", tags=["status"])
 async def read_health(*, _session: SessionDep) -> HealthCheck:
     return HealthCheck(status="ok")
