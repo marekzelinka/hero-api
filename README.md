@@ -1,6 +1,6 @@
-# HerosDB REST API
+# HeroDB REST API
 
-A modern, high-performance asynchronous REST API built with **FastAPI** and **SQLModel**. This project manages a database of heroes, their teams, and secret missions using a robust **Python** stack designed for speed and developer ergonomics.
+A modern, high-performance async REST API built with **FastAPI** and **SQLModel**. This project manages a database of heroes, their teams, and secret missions using a robust **Python** stack designed for speed and developer ergonomics.
 
 ## 🚀 Features
 
