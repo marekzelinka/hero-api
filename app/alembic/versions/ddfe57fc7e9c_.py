@@ -1,8 +1,8 @@
-"""init
+"""empty message
 
-Revision ID: a884ec7e85e5
+Revision ID: ddfe57fc7e9c
 Revises: 
-Create Date: 2026-01-14 13:10:14.080056
+Create Date: 2026-03-05 10:17:44.465265
 
 """
 from typing import Sequence, Union
@@ -13,7 +13,7 @@ import sqlmodel.sql.sqltypes
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'a884ec7e85e5'
+revision: str = 'ddfe57fc7e9c'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -28,9 +28,6 @@ def upgrade() -> None:
     sa.Column('id', sa.Uuid(), nullable=False),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_mission'))
     )
-    with op.batch_alter_table('mission', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_mission_id'), ['id'], unique=False)
-
     op.create_table('team',
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('headquarters', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
@@ -38,7 +35,6 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id', name=op.f('pk_team'))
     )
     with op.batch_alter_table('team', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_team_id'), ['id'], unique=False)
         batch_op.create_index(batch_op.f('ix_team_name'), ['name'], unique=False)
 
     op.create_table('hero',
@@ -52,7 +48,6 @@ def upgrade() -> None:
     )
     with op.batch_alter_table('hero', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_hero_age'), ['age'], unique=False)
-        batch_op.create_index(batch_op.f('ix_hero_id'), ['id'], unique=False)
         batch_op.create_index(batch_op.f('ix_hero_name'), ['name'], unique=False)
 
     op.create_table('heromissionlink',
@@ -71,17 +66,12 @@ def downgrade() -> None:
     op.drop_table('heromissionlink')
     with op.batch_alter_table('hero', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_hero_name'))
-        batch_op.drop_index(batch_op.f('ix_hero_id'))
         batch_op.drop_index(batch_op.f('ix_hero_age'))
 
     op.drop_table('hero')
     with op.batch_alter_table('team', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_team_name'))
-        batch_op.drop_index(batch_op.f('ix_team_id'))
 
     op.drop_table('team')
-    with op.batch_alter_table('mission', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_mission_id'))
-
     op.drop_table('mission')
     # ### end Alembic commands ###

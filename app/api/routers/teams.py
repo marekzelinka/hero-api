@@ -2,10 +2,10 @@ import uuid
 from collections.abc import Sequence
 from typing import Annotated
 
-from fastapi import APIRouter, Body, HTTPException, Path, Query, status
+from fastapi import APIRouter, HTTPException, Query, status
 from sqlmodel import select
 
-from app.deps import SessionDep
+from app.api.deps import SessionDep
 from app.models import Team, TeamCreate, TeamPublic, TeamPublicWithHeroes, TeamUpdate
 
 router = APIRouter(prefix="/teams", tags=["teams"])
@@ -15,12 +15,15 @@ router = APIRouter(prefix="/teams", tags=["teams"])
 async def create_team(
     *,
     session: SessionDep,
-    team: Annotated[TeamCreate, Body()],
+    team: TeamCreate,
 ) -> Team:
     db_team = Team.model_validate(team)
+
     session.add(db_team)
+
     await session.commit()
     await session.refresh(db_team)
+
     return db_team
 
 
@@ -39,46 +42,45 @@ async def read_teams(
 async def read_team(
     *,
     session: SessionDep,
-    team_id: Annotated[uuid.UUID, Path()],
+    team_id: uuid.UUID,
 ) -> Team:
     team = await session.get(Team, team_id)
     if not team:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Team not found"
         )
+
     return team
 
 
 @router.patch("/{team_id}", response_model=TeamPublic)
 async def update_team(
-    *,
-    session: SessionDep,
-    team_id: Annotated[uuid.UUID, Path()],
-    team: Annotated[TeamUpdate, Body()],
+    *, session: SessionDep, team_id: uuid.UUID, team: TeamUpdate
 ) -> Team:
     db_team = await session.get(Team, team_id)
     if not db_team:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Team not found"
         )
+
     team_data = team.model_dump(exclude_unset=True)
     db_team.sqlmodel_update(team_data)
+
     session.add(db_team)
+
     await session.commit()
     await session.refresh(db_team)
+
     return db_team
 
 
 @router.delete("/{team_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_team(
-    *,
-    session: SessionDep,
-    team_id: Annotated[uuid.UUID, Path()],
-) -> None:
+async def delete_team(*, session: SessionDep, team_id: uuid.UUID) -> None:
     team = await session.get(Team, team_id)
     if not team:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Team not found"
         )
+
     await session.delete(team)
     await session.commit()

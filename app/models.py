@@ -1,8 +1,8 @@
 import uuid
 
-from sqlmodel import Field, MetaData, Relationship, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
 
-sqlite_naming_convention = {
+NAMING_CONVENTION = {
     "ix": "ix_%(column_0_label)s",
     "uq": "uq_%(table_name)s_%(column_0_name)s",
     "ck": "ck_%(table_name)s_%(constraint_name)s",
@@ -10,7 +10,9 @@ sqlite_naming_convention = {
     "pk": "pk_%(table_name)s",
 }
 
-SQLModel.metadata = MetaData(naming_convention=sqlite_naming_convention)
+metadata = SQLModel.metadata
+# Prevent migration errors (especially with SQLite)
+metadata.naming_convention = NAMING_CONVENTION
 
 
 class TeamBase(SQLModel):
@@ -19,7 +21,7 @@ class TeamBase(SQLModel):
 
 
 class Team(TeamBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
 
     heroes: list[Hero] = Relationship(
         back_populates="team",
@@ -62,7 +64,7 @@ class HeroBase(SQLModel):
 
 
 class Hero(HeroBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
 
     team: Team | None = Relationship(
         back_populates="heroes",
@@ -102,7 +104,7 @@ class MissionBase(SQLModel):
 
 
 class Mission(MissionBase, table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, index=True)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
 
     heroes: list[Hero] = Relationship(
         back_populates="missions",
@@ -126,15 +128,3 @@ class MissionPublicWithHeroes(MissionPublic):
 class MissionUpdate(SQLModel):
     description: str | None = None
     active: bool | None = None
-
-
-class HealthCheck(SQLModel):
-    """Models a status check for our /health endpoint."""
-
-    status: str
-
-
-class Message(SQLModel):
-    """Models a generic messages, used as a response model in routes."""
-
-    message: str

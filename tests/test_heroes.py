@@ -9,7 +9,7 @@ from app.models import Hero
 @pytest.mark.asyncio
 async def test_create_hero(client: AsyncClient) -> None:
     r = await client.post(
-        "/heroes/", json={"name": "Deadpond", "secret_name": "Dive Wilson"}
+        "/api/v1/heroes/", json={"name": "Deadpond", "secret_name": "Dive Wilson"}
     )
     assert r.status_code == status.HTTP_201_CREATED
     data = r.json()
@@ -22,14 +22,14 @@ async def test_create_hero(client: AsyncClient) -> None:
 @pytest.mark.asyncio
 async def test_create_hero_incomplete(client: AsyncClient) -> None:
     # Falis validation because of missing secret_name in json
-    r = await client.post("/heroes/", json={"name": "Deadpond"})
+    r = await client.post("/api/v1/heroes/", json={"name": "Deadpond"})
     assert r.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
 @pytest.mark.asyncio
 async def test_create_hero_invalid(client: AsyncClient) -> None:
     r = await client.post(
-        "/heroes/",
+        "/api/v1/heroes/",
         json={
             "name": "Deadpond",
             "secret_name": {"message": "Do you wanna know my secret identity?"},
@@ -48,7 +48,7 @@ async def test_read_heroes(session: AsyncSession, client: AsyncClient) -> None:
     await session.refresh(hero_1)
     await session.refresh(hero_2)
 
-    r = await client.get("/heroes/")
+    r = await client.get("/api/v1/heroes/")
     assert r.status_code == status.HTTP_200_OK
     data = r.json()
     assert len(data) == 2
@@ -74,7 +74,7 @@ async def test_read_hero(session: AsyncSession, client: AsyncClient) -> None:
     await session.commit()
     await session.refresh(hero_1)
 
-    r = await client.get(f"/heroes/{hero_1.id!s}")
+    r = await client.get(f"/api/v1/heroes/{hero_1.id!s}")
     assert r.status_code == status.HTTP_200_OK
     data = r.json()
     assert data["name"] == hero_1.name
@@ -90,7 +90,7 @@ async def test_update_hero(session: AsyncSession, client: AsyncClient) -> None:
     await session.commit()
     await session.refresh(hero_1)
 
-    r = await client.patch(f"/heroes/{hero_1.id}", json={"name": "Deadpuddle"})
+    r = await client.patch(f"/api/v1/heroes/{hero_1.id}", json={"name": "Deadpuddle"})
     assert r.status_code == status.HTTP_200_OK
     data = r.json()
     assert data["name"] == "Deadpuddle"
@@ -105,7 +105,7 @@ async def test_delete_hero(session: AsyncSession, client: AsyncClient) -> None:
     await session.commit()
     await session.refresh(hero_1)
 
-    r = await client.delete(f"/heroes/{hero_1.id}")
+    r = await client.delete(f"/api/v1/heroes/{hero_1.id}")
     assert r.status_code == status.HTTP_204_NO_CONTENT
 
     hero_in_db = await session.get(Hero, hero_1.id)
