@@ -33,14 +33,12 @@ class Settings(BaseSettings):
     frontend_host: str = "http://localhost:5173"
     environment: Literal["local", "staging", "production"] = "local"
     log_level: str = "info"
-    backend_cors_origins: Annotated[
-        list[AnyUrl] | str, BeforeValidator(parse_cors)
-    ] = []
+    cors_origins: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = []
 
     @computed_field
     @property
     def all_cors_origins(self) -> list[str]:
-        return [str(origin).rstrip("/") for origin in self.backend_cors_origins] + [
+        return [str(origin).rstrip("/") for origin in self.cors_origins] + [
             self.frontend_host
         ]
 
